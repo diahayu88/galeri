@@ -1,4 +1,4 @@
-/* DAK v2.23 (optimasi kecepatan, plakat karya siswa gaya museum; fitur sampai v2.25 tetap) - Museum 3D. Dimuat SETELAH skrip utama di index.html.
+/* DAK v2.25 (optimasi kecepatan, plakat karya siswa gaya museum; fitur sampai v2.25 tetap) - Museum 3D. Dimuat SETELAH skrip utama di index.html.
    Memakai: $, gs, pesan, POS, pindah. Menyediakan: bangunMuseum(). */
 const WARNA = { Naturalisme:'#6f8f5a', Realisme:'#8a7a64', Romantisme:'#7b5a8c', Abstrak:'#c9902f', Impresionisme:'#8fb3a3', Kubisme:'#b08a5a', Ekspresionisme:'#b3412f', Surealisme:'#6b5b95', Nusantara:'#c9902f' };
 const RUANG_TAHAP1 = 'Impresionisme';           // Tahap 1: satu ruang saja
@@ -752,13 +752,16 @@ try{ (function(){
   tb('mDenah','Denah',()=>bukaDenah(),tempat);
   atur.append($('bBayang')); tb('mZoom','Zoom normal',()=>aturFov(80),atur);
   if(document.fullscreenEnabled) tb('mFull','Layar penuh',()=>{ document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen(); },atur);
-  const bm=document.createElement('button'); bm.id='bMenu'; bm.textContent='\u2630 Menu'; bm.setAttribute('aria-expanded','false');
-  bukaMenu=b=>{ isi.style.display=b?'flex':'none'; bm.setAttribute('aria-expanded',String(b)); };
+  /* v2.24: tombol Beranda (kembali ke halaman penghubung) di dasar laci; tirai gelap menutup laci saat diketuk */
+  const bh=document.createElement('button'); bh.id='mHome'; bh.className='alt'; bh.type='button'; bh.textContent='Beranda'; bh.onclick=()=>{ location.href='https://diahayu88.github.io/'; }; isi.append(bh);
+  const tirai=document.createElement('div'); tirai.id='hudTirai'; document.body.append(tirai); tirai.onclick=()=>bukaMenu(false);
+  const bm=document.createElement('button'); bm.id='bMenu'; bm.textContent='\u2630 Menu'; bm.setAttribute('aria-expanded','false'); bm.setAttribute('aria-label','Menu');
+  bukaMenu=b=>{ isi.style.display=b?'flex':'none'; bm.setAttribute('aria-expanded',String(b)); document.body.classList.toggle('laciBuka',!!b); };
   bm.onclick=()=>bukaMenu(isi.style.display!=='flex');
   segarMenu=()=>{ const j=$('mJoy'), v=$('mVR'), g=$('mGeser');
     if(j) j.setAttribute('aria-pressed',String(!modeVR)); if(v) v.setAttribute('aria-pressed',String(modeVR));
     if(g) g.textContent='Geser layar: '+(geserIkut?'ikut jari':'tarik dunia'); };
-  hud.prepend(bm); hud.insertBefore(isi,$('pager')); bukaMenu(!sentuh); segarMenu();
+  hud.prepend(bm); hud.insertBefore(isi,$('pager')); bukaMenu(false); segarMenu();   /* v2.24: laci tertutup di awal (laptop dan HP) */
 })(); }catch(e){ pesan('Menu gagal dibuat: '+e.message,12000); }
 document.head.insertAdjacentHTML('beforeend','<style>#hud{flex-direction:column;align-items:flex-start;gap:6px}#hudIsi{display:none;flex-direction:column;gap:8px;max-height:72vh;overflow:auto;max-width:calc(100vw - 40px)}'+
   '.grupMenu b{display:block;font-size:12px;color:#5b5346;margin:2px 0 3px}.grupMenu .baris{display:flex;flex-wrap:wrap;gap:6px}#hud button[aria-pressed="true"]{outline:3px solid #1d2a2f}</style>');
@@ -831,7 +834,7 @@ try{ const isiM=$('hudIsi'); if(isiM){
   grups.forEach(g=>{ const h=g.querySelector('b'); if(!h) return; h.classList.add('gHead'); h.setAttribute('role','button'); h.tabIndex=0; h.setAttribute('aria-expanded','false');
     h.addEventListener('click',()=>ganti(g)); h.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); ganti(g); } }); });
   document.addEventListener('pointerdown',e=>{ if(!(e.target.closest&&e.target.closest('#hud'))) tutupSemua(); },true);   /* ketuk di luar menu: sub menu menutup */
-  document.addEventListener('keydown',e=>{ if(e.key==='Escape') tutupSemua(); });
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ tutupSemua(); if(bukaMenu) bukaMenu(false); } });
   const bm=$('bMenu'); if(bm) bm.addEventListener('click',tutupSemua);
   /* Layar sentuh: setelah memilih tempat (grup pertama), seluruh menu menutup sendiri supaya layar tidak tertutup. Pengaturan tetap terbuka. */
   if(sentuh) isiM.addEventListener('click',e=>{ const b=e.target.closest&&e.target.closest('button'); if(!b) return;
@@ -1154,4 +1157,60 @@ function gambarDenah(pos){
   return c.toDataURL('image/png');
 }
 
-try{ tandaiModul('museum','2.23'); }catch(e){}   // penanda: museum.js termuat sampai akhir (HARUS tetap paling bawah)
+document.head.insertAdjacentHTML('beforeend',`<style>
+/* ===== v2.24: menu menjadi laci kiri + panel diseragamkan (gaya Kelas Raudhah). HANYA tampilan; isi menu, id, dan alur tidak diubah. ===== */
+:root{--rAk:#2f6f8f;--rAkT:#1b4760;--rHm:#e1eef4;--rAbu:#eef0ee;--rGaris:#e3e7e4;--rMut:#5f6b76;--rHov:rgba(47,111,143,.09)}
+#hudTirai{position:fixed;inset:0;z-index:21;background:rgba(15,23,20,.45);display:none}
+body.laciBuka #hudTirai{display:block}
+body.laciBuka #hud.ui{z-index:22}
+/* tombol pembuka */
+#hud.ui #bMenu{background:var(--rAk);color:#fff;text-shadow:none;border-radius:26px;height:48px;min-height:48px;padding:0 20px;font-size:15px;font-weight:700;box-shadow:0 3px 10px rgba(0,0,0,.3)}
+#hud.ui #bMenu:active{transform:none;filter:brightness(.92)}
+/* tombol tutup: pindah ke sudut kanan atas laci */
+#hud.ui #bMenu[aria-expanded="true"]{position:fixed;z-index:3;top:calc(14px + env(safe-area-inset-top,0px));left:calc(min(296px,86vw) - 58px);width:44px;height:44px;min-height:44px;padding:0;font-size:0;border-radius:50%;background:transparent;color:var(--rMut);box-shadow:none;filter:none}
+#hud.ui #bMenu[aria-expanded="true"]::before{content:"\\2715";font-size:20px;line-height:1}
+/* laci */
+#hud.ui #hudIsi{position:fixed;z-index:1;left:0;top:0;bottom:0;width:min(296px,86vw);max-width:none;max-height:none;box-sizing:border-box;flex-direction:column;flex-wrap:nowrap;align-items:stretch;gap:2px;
+  padding:calc(78px + env(safe-area-inset-top,0px)) 14px calc(14px + env(safe-area-inset-bottom,0px));background:#fff;color:var(--ink);border-radius:0 22px 22px 0;box-shadow:6px 0 24px rgba(0,0,0,.28);
+  overflow-y:auto;overscroll-behavior:contain;pointer-events:auto;animation:laciMasuk .22s ease-out}
+@keyframes laciMasuk{from{transform:translateX(-24px);opacity:.4}to{transform:none;opacity:1}}
+#hud.ui #hudIsi::before{content:"Ruang Rupa Interaktif";position:absolute;left:14px;right:70px;top:calc(14px + env(safe-area-inset-top,0px));min-height:48px;display:flex;align-items:center;font:800 17px/1.2 system-ui,sans-serif;color:var(--ink)}
+#hud.ui #hudIsi::after{content:"";position:absolute;left:14px;right:14px;top:calc(68px + env(safe-area-inset-top,0px));height:1px;background:var(--rGaris)}
+/* grup: judul jadi label kecil, isi selalu terlihat */
+#hud.ui .grupMenu{display:block}
+#hud.ui .grupMenu .gHead{display:block;height:auto;min-height:0;margin:0;padding:12px 10px 4px;background:none;box-shadow:none;text-shadow:none;color:var(--rMut);font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;border-radius:0;cursor:default;pointer-events:none;filter:none}
+#hud.ui .grupMenu .gHead::after{display:none}
+#hud.ui .grupMenu .baris,#hud.ui .grupMenu.buka .baris,#hud.ui .grupMenu.buka .baris.dua,#hud.ui .grupMenu:not(.buka) .baris{display:flex;flex-direction:column;position:static;width:auto;min-width:0;max-width:none;max-height:none;overflow:visible;padding:0;margin:0;gap:2px;animation:none}
+/* butir menu */
+#hud.ui .grupMenu .baris button,#hud.ui #mHome{display:flex;align-items:center;gap:14px;width:100%;min-height:52px;padding:4px 10px;border:0;border-radius:14px;background:transparent;color:var(--ink);font-size:16px;font-weight:600;line-height:1.25;text-align:left;text-shadow:none;box-shadow:none;transform:none;filter:none;white-space:normal;outline:0}
+#hud.ui .grupMenu .baris button:hover,#hud.ui #mHome:hover{background:var(--rHov);filter:none}
+#hud.ui .grupMenu .baris button::before,#hud.ui #mHome::before{content:"\\25C6";flex:none;width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:var(--rHm);color:var(--rAkT);font-size:19px;line-height:1}
+#hud.ui .grupMenu .baris button[aria-pressed="true"]{outline:0;background:var(--rHov)}
+#hud.ui .grupMenu .baris button[aria-pressed="true"]::before{background:#1f4f99;color:#fff}
+#hud.ui .grupMenu .baris button:focus-visible,#hud.ui #mHome:focus-visible{outline:3px solid #f2b705;outline-offset:-3px}
+#hud.ui .grupMenu .baris [data-zona="A"]::before{content:"\\1F5BC\\FE0F"}#hud.ui .grupMenu .baris [data-zona="C"]::before{content:"\\2728"}#hud.ui .grupMenu .baris [data-zona="D"]::before{content:"\\1F9D1\\200D\\1F3A8"}
+#hud.ui #bMasuk::before{content:"\\1F6AA"}#hud.ui #bMaestro::before{content:"\\1F58C\\FE0F"}#hud.ui #bAtas::before{content:"\\1F52D"}#hud.ui #mDenah::before{content:"\\1F5FA\\FE0F"}
+#hud.ui #bBayang::before{content:"\\1F313"}#hud.ui #mZoom::before{content:"\\1F50D"}#hud.ui #mFull::before{content:"\\26F6"}#hud.ui #mJoy::before{content:"\\1F579\\FE0F"}
+#hud.ui #mVR::before,#hud.ui #mKac::before{content:"\\1F97D"}#hud.ui #mGeser::before{content:"\\1F446"}#hud.ui #bAdmin::before{content:"\\1F6E0\\FE0F"}#hud.ui #mHome::before{content:"\\1F3E0"}
+/* Beranda di dasar laci */
+#hud.ui #mHome{margin-top:auto;border-top:1px solid var(--rGaris);border-radius:0 0 14px 14px;padding-top:8px;flex:none}
+#hud.ui #hudIsi>.grupMenu:last-of-type{margin-bottom:12px}
+/* pager halaman */
+#pager{background:#fff;border-radius:999px;padding:4px 10px;box-shadow:0 3px 10px rgba(0,0,0,.25)}
+@media (orientation:landscape) and (max-height:520px){#hud.ui #hudIsi{padding-top:calc(66px + env(safe-area-inset-top,0px))}#hud.ui #hudIsi::after{top:calc(58px + env(safe-area-inset-top,0px))}#hud.ui .grupMenu .baris button,#hud.ui #mHome{min-height:44px;font-size:15px}#hud.ui .grupMenu .baris button::before,#hud.ui #mHome::before{width:32px;height:32px;font-size:16px}#hud.ui .grupMenu .gHead{padding-top:8px}}
+/* panel lain: kartu membulat, tombol 44+ px, isian lembut */
+#studio,#info,#latihan,#kartuKarya,#adm,#daftar,#login,#lobi{border-radius:22px;box-shadow:0 8px 30px rgba(0,0,0,.28)}
+#adm{border-radius:20px}
+#info .aksi,#latihan .aksi{border-radius:0 0 22px 22px}
+:is(#studio,#info,#latihan,#kartuKarya,#adm,#daftar,#login,#lobi) button{min-height:44px;border-radius:12px;font-weight:700;background:var(--rAk);color:#fff}
+:is(#studio,#info,#latihan,#kartuKarya,#adm,#daftar,#login,#lobi) button.alt{background:var(--rAbu);color:var(--ink);border:1.5px solid var(--rGaris)}
+#adm .tab{background:var(--rAbu);color:var(--ink);border:1.5px solid var(--rGaris)}#adm .tab[aria-selected="true"]{background:var(--rAk);color:#fff;border-color:var(--rAk)}
+:is(#studio,#adm,#daftar,#login,#lobi) :is(input:not([type=checkbox]):not([type=radio]),select,textarea){border:1.5px solid var(--rGaris);border-radius:12px;min-height:44px;background:var(--rAbu);color:var(--ink);font-size:15px}
+:is(#studio,#adm,#daftar,#lobi) :is(input,select,textarea):focus{border-color:var(--rAk)}
+#latihan label.op{border:1.5px solid var(--rGaris);border-radius:14px;background:#fff}
+#latihan .bahas{border-radius:12px}
+#adm td,#adm th{border-bottom-color:var(--rGaris)}
+#studio label,#daftar label,#lobi label{color:var(--rMut);font-size:13px;font-weight:700}
+@media (prefers-reduced-motion:reduce){#hud.ui #hudIsi{animation:none}}
+</style>`);   /* v2.24: gaya laci dan panel */
+try{ tandaiModul('museum','2.25'); }catch(e){}   // penanda: museum.js termuat sampai akhir (HARUS tetap paling bawah)

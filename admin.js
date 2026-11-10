@@ -1,4 +1,4 @@
-/* DAK v2.23 - Panel Admin: Langkah awal, Lukisan, Kelas, Soal, Moderasi, Rekap, Pengguna, Log. Dimuat setelah museum.js.
+/* DAK v2.25 - Panel Admin: Langkah awal, Lukisan, Kelas, Soal, Moderasi, Rekap, Pengguna, Log. Dimuat setelah museum.js.
    Menyembunyikan tombol hanyalah kenyamanan; hak akses sebenarnya diperiksa server (wajibPeran_). */
 const RANK = { siswa:1, manajer:2, admin:3, pemilik:4 };
 let kelasData = [], tabAdm = 'mulai';
@@ -244,4 +244,4 @@ async function renderModerasi(){
   muat();
 }
 
-try{ tandaiModul('admin','2.23'); }catch(e){}
+try{ tandaiModul('admin','2.25'); }catch(e){}
