@@ -1,4 +1,4 @@
-/* DAK v2.25 (optimasi kecepatan, plakat karya siswa gaya museum; fitur sampai v2.25 tetap) - Museum 3D. Dimuat SETELAH skrip utama di index.html.
+/* DAK v2.27 (optimasi kecepatan, plakat karya siswa gaya museum; fitur sampai v2.25 tetap) - Museum 3D. Dimuat SETELAH skrip utama di index.html.
    Memakai: $, gs, pesan, POS, pindah. Menyediakan: bangunMuseum(). */
 const WARNA = { Naturalisme:'#6f8f5a', Realisme:'#8a7a64', Romantisme:'#7b5a8c', Abstrak:'#c9902f', Impresionisme:'#8fb3a3', Kubisme:'#b08a5a', Ekspresionisme:'#b3412f', Surealisme:'#6b5b95', Nusantara:'#c9902f' };
 const RUANG_TAHAP1 = 'Impresionisme';           // Tahap 1: satu ruang saja
@@ -641,12 +641,12 @@ const KUNCI=['w','a','s','d','q','e','arrowup','arrowdown','arrowleft','arrowrig
 addEventListener('keydown',e=>{
   tombolPutar.shift=e.shiftKey;
   if(/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)||e.ctrlKey||e.metaKey||e.altKey) return;
-  const k=e.key.toLowerCase();
+  const k=(e.key||'').toLowerCase();
   if(k==='z'&&token&&bingkaiAktif<0){ const lc=kendaliPandang(); if(lc) lc.yawObject.rotation.y+=Math.PI; return; }   // balik badan
   if(k==='+'||k==='='){ aturFov(fov-5); return; } if(k==='-'){ aturFov(fov+5); return; } if(k==='0'){ aturFov(80); return; }
   if(!KUNCI.includes(k)) return;
   tombolPutar[k]=true; batalJalan(); if(k.startsWith('arrow')){ e.preventDefault(); e.stopImmediatePropagation(); } },true);
-addEventListener('keyup',e=>{ tombolPutar.shift=e.shiftKey; delete tombolPutar[e.key.toLowerCase()]; },true);
+addEventListener('keyup',e=>{ tombolPutar.shift=e.shiftKey; delete tombolPutar[(e.key||'').toLowerCase()]; },true);
 addEventListener('blur',()=>{ for(const k in tombolPutar) delete tombolPutar[k]; });
 function gerakKunci(){   // W/panah atas maju, S/panah bawah mundur, A/D geser, Q/E/panah kiri-kanan putar, Shift lari
   const n=performance.now(), dt=Math.min(0.05,(n-tPutar)/1000); tPutar=n;
@@ -1213,4 +1213,4 @@ body.laciBuka #hud.ui{z-index:22}
 #studio label,#daftar label,#lobi label{color:var(--rMut);font-size:13px;font-weight:700}
 @media (prefers-reduced-motion:reduce){#hud.ui #hudIsi{animation:none}}
 </style>`);   /* v2.24: gaya laci dan panel */
-try{ tandaiModul('museum','2.25'); }catch(e){}   // penanda: museum.js termuat sampai akhir (HARUS tetap paling bawah)
+try{ tandaiModul('museum','2.27'); }catch(e){}   // penanda: museum.js termuat sampai akhir (HARUS tetap paling bawah)

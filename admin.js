@@ -1,4 +1,4 @@
-/* DAK v2.25 - Panel Admin: Langkah awal, Lukisan, Kelas, Soal, Moderasi, Rekap, Pengguna, Log. Dimuat setelah museum.js.
+/* DAK v2.27 - Panel Admin: Langkah awal, Lukisan, Kelas, Soal, Moderasi, Rekap, Pengguna, Log. Dimuat setelah museum.js.
    Menyembunyikan tombol hanyalah kenyamanan; hak akses sebenarnya diperiksa server (wajibPeran_). */
 const RANK = { siswa:1, manajer:2, admin:3, pemilik:4 };
 let kelasData = [], tabAdm = 'mulai';
@@ -17,6 +17,7 @@ addEventListener('keydown',e=>{ if(e.key==='Escape'&&$('adm').style.display==='b
 const keLoginAsli=keLogin; keLogin=function(i){ tutupAdmin(); const b=$('bAdmin'); if(b) b.remove(); if($('hudAdmin')) $('hudAdmin').parentElement.style.display='none'; keLoginAsli(i); };
 
 async function bukaAdmin(){
+  if(typeof bukaMenu==='function') bukaMenu(false);   // v2.27: laci menu ditutup agar tidak menutupi panel
   $('adm').style.display='block'; $('admIsi').textContent='Memuat...'; if(window.renderJeda) renderJeda(true);   // v2.23: hentikan penggambaran museum 3D di belakang panel
   try{ kelasData=await gs('adminDaftarKelas'); }catch(e){ tutupAdmin(); return pesan(e.message); }
   pilihTab(kelasData.length?'kelas':'mulai');
@@ -244,4 +245,4 @@ async function renderModerasi(){
   muat();
 }
 
-try{ tandaiModul('admin','2.25'); }catch(e){}
+try{ tandaiModul('admin','2.27'); }catch(e){}
